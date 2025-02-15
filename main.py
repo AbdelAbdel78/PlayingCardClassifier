@@ -13,9 +13,43 @@ import sys
 from tqdm.notebook import tqdm
 
 # Check if all necessary libraries are imported and functional
-print('System Version:', sys.version)
-print('PyTorch version', torch.__version__)
-print('Torchvision version', torchvision.__version__)
-print('timm version', timm.__version__)
-print('Numpy version', numpy.__version__)
-print('Pandas version', pandas.__version__)
+# print('System Version:', sys.version)
+# print('PyTorch version', torch.__version__)
+# print('Torchvision version', torchvision.__version__)
+# print('timm version', timm.__version__)
+# print('Numpy version', numpy.__version__)
+# print('Pandas version', pandas.__version__)
+
+# Ensure all images are standardized
+transform = transforms.Compose([
+    transforms.Resize((128, 128)),
+    transforms.ToTensor(),
+])
+
+class PlayingCardDataset(Dataset):
+
+    def __init__(self, data_dir, transform = None):
+        self.data = ImageFolder(data_dir, transform = transform)        
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
+    
+    @property
+    def classes(self):
+        return self.data.classes
+
+# Import and verify dataset
+train_dir = './dataset/train'
+dataset = PlayingCardDataset(train_dir, transform)
+
+# Import dict to transalte label to card values
+label_to_card = {v: k for k, v in ImageFolder(train_dir).class_to_idx.items()}
+
+# Create DataLoader from imported dataset
+dataloader = DataLoader(dataset, batch_size = 32, shuffle = True)
+
+for images, labels in dataloader:
+    break
