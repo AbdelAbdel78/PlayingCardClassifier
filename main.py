@@ -12,8 +12,10 @@ import numpy
 import sys
 from tqdm.notebook import tqdm
 
+# Check if all necessary libraries are imported and functional
 print('System Version:', sys.version)
 print('PyTorch version', torch.__version__)
 print('Torchvision version', torchvision.__version__)
+print('timm version', timm.__version__)
 print('Numpy version', numpy.__version__)
 print('Pandas version', pandas.__version__)
