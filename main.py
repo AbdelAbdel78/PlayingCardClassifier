@@ -176,7 +176,7 @@ def calculate_accuracy(model, dataloader, device, class_names):
     total_predictions = 0
     
     with torch.no_grad():  # Don't compute gradients
-        for images, labels in tqdm(dataloader, desc='Evaluating'):
+        for images, labels in dataloader:
             images, labels = images.to(device), labels.to(device)
 
             # Get predictions
@@ -189,9 +189,9 @@ def calculate_accuracy(model, dataloader, device, class_names):
                     # Misclassified image, visualize prediction
                     original_image = images[i].cpu().numpy().transpose(1, 2, 0)  # Convert from tensor to numpy
                     original_image = (original_image * 255).astype(numpy.uint8)  # Rescale from [0, 1] to [0, 255]
-                    visualize_predictions(original_image, probabilities[i], class_names)  # Visualize the misclassified image
-                    
+
                     print(f"True label: {class_names[labels[i]]}, Predicted: {class_names[predicted_indices[i]]}")
+                    visualize_predictions(original_image, probabilities[i], class_names)  # Visualize the misclassified image
 
             # Compare predicted labels with true labels
             correct_predictions += (predicted_indices == labels).sum().item()  # Count correct predictions
@@ -199,10 +199,6 @@ def calculate_accuracy(model, dataloader, device, class_names):
 
     accuracy = correct_predictions / total_predictions * 100  # Percentage accuracy
     return accuracy
-
-# Calculate accuracy on the validation set
-val_accuracy = calculate_accuracy(model, valid_dataloader, device, test_dataset.classes)
-print(f"Validation Accuracy: {val_accuracy:.2f}%")
 
 # Calculate accuracy on the test set
 test_accuracy = calculate_accuracy(model, test_dataloader, device, test_dataset.classes)
