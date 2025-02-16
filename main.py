@@ -152,6 +152,23 @@ def predict(model, image_tensor, device):
         probabilities = torch.nn.functional.softmax(outputs, dim=1)
     return probabilities.cpu().numpy()
 
+# Visualization
+def visualize_predictions(original_image, probabilities, class_names):
+    fig, axarr = plt.subplots(1, 2, figsize=(14, 7))
+    
+    # Display image
+    axarr[0].imshow(original_image)
+    axarr[0].axis("off")
+    
+    # Display predictions
+    axarr[1].barh(class_names, probabilities)
+    axarr[1].set_xlabel("Probability")
+    axarr[1].set_title("Class Predictions")
+    axarr[1].set_xlim(0, 1)
+
+    plt.tight_layout()
+    plt.show(block = True)
+
 # Function to calculate accuracy
 def calculate_accuracy(model, dataloader, device, class_names):
     model.eval()  # Set the model to evaluation mode
@@ -167,6 +184,16 @@ def calculate_accuracy(model, dataloader, device, class_names):
             predicted_indices = probabilities.argmax(axis=1)  # Get the predicted indices
 
             # Compare predicted labels with true labels
+            for i in range(len(labels)):
+                if predicted_indices[i] != labels[i]:
+                    # Misclassified image, visualize prediction
+                    original_image = images[i].cpu().numpy().transpose(1, 2, 0)  # Convert from tensor to numpy
+                    original_image = (original_image * 255).astype(numpy.uint8)  # Rescale from [0, 1] to [0, 255]
+                    visualize_predictions(original_image, probabilities[i], class_names)  # Visualize the misclassified image
+                    
+                    print(f"True label: {class_names[labels[i]]}, Predicted: {class_names[predicted_indices[i]]}")
+
+            # Compare predicted labels with true labels
             correct_predictions += (predicted_indices == labels).sum().item()  # Count correct predictions
             total_predictions += labels.size(0)  # Count total samples
 
@@ -180,4 +207,3 @@ print(f"Validation Accuracy: {val_accuracy:.2f}%")
 # Calculate accuracy on the test set
 test_accuracy = calculate_accuracy(model, test_dataloader, device, test_dataset.classes)
 print(f"Test Accuracy: {test_accuracy:.2f}%")
-
