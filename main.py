@@ -91,7 +91,7 @@ else:
     print("No saved model found. Training from scratch...")
 
     train_losses, val_losses = [], []
-    numEpoch = 5
+    numEpoch = 7
     for epoch in range(numEpoch):
 
         # Training phase
